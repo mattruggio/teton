@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'in_memory_store'
-require_relative 'location'
+require_relative 'entry'
+require_relative 'key'
+require_relative 'stores/memory'
 
 module Teton
   # The main interface for any store backend.
@@ -10,7 +11,7 @@ module Teton
 
     attr_reader :separator, :store
 
-    def initialize(separator: DEFAULT_SEPARATOR, store: InMemoryStore.new)
+    def initialize(separator: DEFAULT_SEPARATOR, store: Stores::Memory.new)
       raise ArgumentError, 'separator is required' if separator.to_s.empty?
 
       @separator = separator.to_s
@@ -19,28 +20,28 @@ module Teton
       freeze
     end
 
-    def set(path, data)
-      location = location(path)
+    def set(key, data)
+      key = key(key)
 
-      raise ArgumentError, "path: #{path} does not point to an entry" unless location.entry?
+      raise ArgumentError, "key: #{key} does not point to an entry" unless key.entry?
 
-      store.set(location, string_keys_and_values(data))
+      store.set(key, string_keys_and_values(data))
 
       self
     end
 
-    def get(path)
-      store.get(location(path))
+    def get(key)
+      store.get(key(key))
     end
 
-    def del(path)
-      tap { store.del(location(path)) }
+    def del(key)
+      tap { store.del(key(key)) }
     end
 
     private
 
-    def location(path)
-      Location.new(path, separator: separator)
+    def key(key)
+      key.is_a?(Key) ? key : Key.new(key, separator: separator)
     end
 
     def string_keys_and_values(hash)

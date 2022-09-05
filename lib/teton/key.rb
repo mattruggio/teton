@@ -2,7 +2,7 @@
 
 module Teton
   # Understands a fully-qualified path to a resource or resources.
-  class Location
+  class Key
     attr_reader :path, :parts, :separator
 
     def initialize(path, separator:)

@@ -24,7 +24,82 @@ bundle add teton
 
 ## Examples
 
-TODO
+The main API is made up of three instance methods: Db#set, Db#get, and Db#del.  You interact with each of these by passing in a key (and data for set).
+
+#### Setting Up Database
+
+````ruby
+db = Teton::Db.new
+````
+
+#### Setting Objects
+
+````ruby
+bozo_key             = 'users/1'
+inception_key        = "#{bozo_key}/movies/1"      # => users/1/movies/1
+inception_actors_key = "#{inception_key}/actors"   # => users/1/movies/1/actors
+leo_key              = "#{inception_actors_key}/1" # => users/1/movies/1/actors/1
+tom_key              = "#{inception_actors_key}/2" # => users/1/movies/1/actors/2
+
+db.set(bozo_key, first: 'bozo', last: 'clown')
+  .set(inception_key, title: 'Inception', year: 2010)
+  .set(leo_key, first: 'Leonardo', last: 'DiCaprio', star: true)
+  .set(tom_key, first: 'Tom', last: 'Hardy', star: true)
+````
+
+Note(s):
+
+* `#set` returns self.
+* If an inner key within the key does not exist then it will be added to the hierarchy.
+
+#### Retrieving Objects
+
+````ruby
+bozo             = db.get(bozo_key)             # => Teton::Entry
+inception        = db.get(inception_key)        # => Teton::Entry
+leo              = db.get(leo_key)              # => Teton::Entry
+tom              = db.get(tom_key)              # => Teton::Entry
+inception_actors = db.get(inception_actors_key) # => [Teton::Entry]
+````
+
+Note(s):
+
+* If a key does not exist then nil will be returned.
+* If a key is for a resource then it will return an array.
+
+#### Deleting Objects
+
+````ruby
+db.del(leo_key)
+  .get(inception_key)
+  .del(bozo_key)
+````
+
+Note(s):
+
+* `#del` returns self.
+* If an inner key is deleted then all child keys in the hierarchy are deleted.
+
+#### Backends
+
+The back-end: `Teton::Stores::Memory` will be used by default.  You can also pass in another back-end if one exists:
+
+````ruby
+store = Teton::Stores::MySQL.new(host: '127.0.0.1', db: 'teton_entries')
+db = Teton::Db.new(store: store)
+````
+
+Note(s):
+
+* Each back-end may require specific configuration so it is up to you to check the desired back-end's documentation.
+* Currently `Teton::Stores::MySQL` does not exist as an implementation but any store (i.e. MySQL, PostgeSQL, Redis, S3, traditional file systems) should all be possible.
+
+Each back-end provides its own persistence mechanics.  For example, `Teton::Stores::Memory` provides persistence/serialization methods:
+
+* `#load!(path(`: Load from a file on disk
+* `#save!(path)`: Save to a file on disk
+* `#from_json!`: Deserialize a passed in JSON string
+* `#to_json`: Return a serialized JSON string
 
 ## Contributing
 

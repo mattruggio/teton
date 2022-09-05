@@ -11,61 +11,61 @@ describe Teton do
 
     # Test SET
 
-    bozo_path = 'users/1'
-    db.set(bozo_path, first: 'bozo', last: 'clown')
+    bozo_key = 'users/1'
+    db.set(bozo_key, first: 'bozo', last: 'clown')
 
-    inception_path = "#{bozo_path}/movies/1"
-    db.set(inception_path, title: 'Inception', year: 2010)
+    inception_key = "#{bozo_key}/movies/1"
+    db.set(inception_key, title: 'Inception', year: 2010)
 
-    inception_actors_path = "#{inception_path}/actors"
+    inception_actors_key = "#{inception_key}/actors"
 
-    leo_path = "#{inception_actors_path}/1"
-    db.set(leo_path, first: 'Leonardo', last: 'DiCaprio', star: true)
+    leo_key = "#{inception_actors_key}/1"
+    db.set(leo_key, first: 'Leonardo', last: 'DiCaprio', star: true)
 
-    tom_path = "#{inception_actors_path}/2"
-    db.set(tom_path, first: 'Tom', last: 'Hardy', star: true)
+    tom_key = "#{inception_actors_key}/2"
+    db.set(tom_key, first: 'Tom', last: 'Hardy', star: true)
 
     # Persist to disk
 
-    db_path = File.join(TEMP_DIR, "#{SecureRandom.uuid}.json")
+    db_key = File.join(TEMP_DIR, "#{SecureRandom.uuid}.json")
 
-    db.store.save!(db_path)
+    db.store.save!(db_key)
 
     # Load staged data from disk
 
     db = Teton::Db.new
 
-    db.store.load!(db_path)
+    db.store.load!(db_key)
 
     # Test GET
 
-    bozo = db.get(bozo_path)
+    bozo = db.get(bozo_key)
 
     expect(bozo['first']).to eq('bozo')
     expect(bozo['last']).to eq('clown')
-    expect(bozo.path).to eq(bozo_path)
+    expect(bozo.key).to eq(bozo_key)
 
-    inception = db.get(inception_path)
+    inception = db.get(inception_key)
 
     expect(inception['title']).to eq('Inception')
     expect(inception['year']).to eq('2010')
-    expect(inception.path).to eq(inception_path)
+    expect(inception.key).to eq(inception_key)
 
-    leo = db.get(leo_path)
+    leo = db.get(leo_key)
 
     expect(leo['first']).to eq('Leonardo')
     expect(leo['last']).to eq('DiCaprio')
     expect(leo['star']).to eq('true')
-    expect(leo.path).to eq(leo_path)
+    expect(leo.key).to eq(leo_key)
 
-    tom = db.get(tom_path)
+    tom = db.get(tom_key)
 
     expect(tom['first']).to eq('Tom')
     expect(tom['last']).to eq('Hardy')
     expect(tom['star']).to eq('true')
-    expect(tom.path).to eq(tom_path)
+    expect(tom.key).to eq(tom_key)
 
-    inception_actors = db.get(inception_actors_path)
+    inception_actors = db.get(inception_actors_key)
 
     expect(inception_actors.length).to eq(2)
 
@@ -74,36 +74,36 @@ describe Teton do
     expect(leo['first']).to eq('Leonardo')
     expect(leo['last']).to eq('DiCaprio')
     expect(leo['star']).to eq('true')
-    expect(leo.path).to eq(leo_path)
+    expect(leo.key).to eq(leo_key)
 
     tom = inception_actors[1]
 
     expect(tom['first']).to eq('Tom')
     expect(tom['last']).to eq('Hardy')
     expect(tom['star']).to eq('true')
-    expect(tom.path).to eq(tom_path)
+    expect(tom.key).to eq(tom_key)
 
     # Test DEL
 
-    db.del(tom_path)
+    db.del(tom_key)
 
-    tom = db.get(tom_path)
+    tom = db.get(tom_key)
 
     expect(tom).to be_nil
 
-    db.del(inception_actors_path)
+    db.del(inception_actors_key)
 
-    inception_actors = db.get(inception_actors_path)
+    inception_actors = db.get(inception_actors_key)
 
     expect(inception_actors).to be_empty
 
-    db.del(bozo_path)
+    db.del(bozo_key)
 
-    inception = db.get(inception_path)
+    inception = db.get(inception_key)
 
     expect(inception).to be_nil
 
-    bozo = db.get(bozo_path)
+    bozo = db.get(bozo_key)
 
     expect(bozo).to be_nil
   end
