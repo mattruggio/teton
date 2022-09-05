@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'key_pointer'
+
 module Teton
   # Understands a fully-qualified path to a resource or resources.
   class Key
@@ -22,8 +24,10 @@ module Teton
       (parts + suffix_keys).join(separator)
     end
 
-    def traverse(&block)
-      parts.each_with_index(&block)
+    def traverse
+      parts.each_with_index do |_part, index|
+        yield KeyPointer.new(self, index)
+      end
     end
 
     def entry?
@@ -32,6 +36,10 @@ module Teton
 
     def resource?
       parts.length.odd?
+    end
+
+    def last_part
+      parts.last
     end
   end
 end

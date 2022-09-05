@@ -20,80 +20,45 @@ module Teton
       # Main Object API
 
       def set(key, data)
-        pointer = store
+        store_pointer = insert_traverse_to_last(key)
 
-        key.traverse do |part, index|
-          if index < key.parts.length - 1
-            pointer = insert_traverse(index, pointer, part)
-          else
-            # last id
-            upsert(pointer, part, data)
-          end
-        end
+        upsert(store_pointer, key.last_part, data)
 
         self
       end
 
       def get(key)
-        pointer = store
+        store_pointer = traverse_to_last(key)
 
-        key.traverse do |part, index|
-          break unless pointer
+        return unless store_pointer
 
-          pointer =
-            if index < key.parts.length - 1
-              # not last part
-              traverse(index, pointer, part)
-            elsif key.resource?
-              # last part
-              entries(key, pointer, part)
-            else
-              # id
-              entry(key, pointer, part)
-            end
+        if key.resource?
+          entries(key, store_pointer, key.last_part)
+        else
+          entry(key, store_pointer, key.last_part)
         end
-
-        pointer
       end
 
       def del(key)
-        pointer = store
+        store_pointer = traverse_to_last(key)
 
-        key.traverse do |part, index|
-          break unless pointer
+        return self unless store_pointer
 
-          if index < key.parts.length - 1
-            # not last part
-            pointer = traverse(index, pointer, part)
-          else
-            # last part
-            pointer.delete(part)
-          end
-        end
+        store_pointer.delete(key.last_part)
 
         self
       end
 
       def count(key)
-        count   = 0
-        pointer = store
+        store_pointer = traverse_to_last(key)
 
-        key.traverse do |part, index|
-          break unless pointer
+        return 0 unless store_pointer
 
-          if index < key.parts.length - 1
-            # not last part
-            pointer = traverse(index, pointer, part)
-          elsif key.resource?
-            # last part
-            count = (pointer.dig(part, IDS_KEY) || {}).keys.length
-          else
-            # id
-            count = pointer.dig(part, DATA_KEY) ? 1 : 0
-          end
+        if key.resource?
+          (store_pointer.dig(key.last_part, IDS_KEY) || {}).keys.length
+        else
+          store_pointer.dig(key.last_part, DATA_KEY) ? 1 : 0
         end
-
-        count
       end
 
       # Persistence API
@@ -155,6 +120,28 @@ module Teton
           # id
           pointer.dig(part, INDICES_KEY)
         end
+      end
+
+      def insert_traverse_to_last(key)
+        store_pointer = store
+
+        key.traverse do |key_pointer|
+          store_pointer = insert_traverse(key_pointer.index, store_pointer, key_pointer.value) if key_pointer.not_last?
+        end
+
+        store_pointer
+      end
+
+      def traverse_to_last(key)
+        store_pointer = store
+
+        key.traverse do |key_pointer|
+          break unless store_pointer
+
+          store_pointer = traverse(key_pointer.index, store_pointer, key_pointer.value) if key_pointer.not_last?
+        end
+
+        store_pointer
       end
 
       def entry(key, pointer, part)
