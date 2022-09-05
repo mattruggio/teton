@@ -83,6 +83,14 @@ describe Teton do
     expect(tom['star']).to eq('true')
     expect(tom.key).to eq(tom_key)
 
+    # Test COUNT
+
+    expect(db.count('doesnt_exist')).to eq(0)
+    expect(db.count('doesnt_exist/1')).to eq(0)
+    expect(db.count(bozo_key)).to eq(1)
+    expect(db.count(inception_key)).to eq(1)
+    expect(db.count(inception_actors_key)).to eq(2)
+
     # Test DEL
 
     db.del(tom_key)

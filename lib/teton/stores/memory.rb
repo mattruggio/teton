@@ -17,29 +17,7 @@ module Teton
         @store = store || {}
       end
 
-      def load!(path)
-        from_json!(File.read(path))
-      end
-
-      def save!(path)
-        dir = File.dirname(path)
-
-        FileUtils.mkdir_p(dir)
-
-        File.write(path, to_json)
-
-        self
-      end
-
-      def from_json!(json)
-        @store = JSON.parse(json)
-
-        self
-      end
-
-      def to_json(*_args)
-        store.to_json
-      end
+      # Main Object API
 
       def set(key, data)
         pointer = store
@@ -66,10 +44,9 @@ module Teton
             if index < key.parts.length - 1
               # not last part
               traverse(index, pointer, part)
-            elsif (key.parts.length % 2).positive?
+            elsif key.resource?
               # last part
               entries(key, pointer, part)
-            # index
             else
               # id
               entry(key, pointer, part)
@@ -95,6 +72,54 @@ module Teton
         end
 
         self
+      end
+
+      def count(key)
+        count   = 0
+        pointer = store
+
+        key.traverse do |part, index|
+          break unless pointer
+
+          if index < key.parts.length - 1
+            # not last part
+            pointer = traverse(index, pointer, part)
+          elsif key.resource?
+            # last part
+            count = (pointer.dig(part, IDS_KEY) || {}).keys.length
+          else
+            # id
+            count = pointer.dig(part, DATA_KEY) ? 1 : 0
+          end
+        end
+
+        count
+      end
+
+      # Persistence API
+
+      def load!(path)
+        from_json!(File.read(path))
+      end
+
+      def save!(path)
+        dir = File.dirname(path)
+
+        FileUtils.mkdir_p(dir)
+
+        File.write(path, to_json)
+
+        self
+      end
+
+      def from_json!(json)
+        @store = JSON.parse(json)
+
+        self
+      end
+
+      def to_json(*_args)
+        store.to_json
       end
 
       private

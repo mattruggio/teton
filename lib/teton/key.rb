@@ -29,5 +29,9 @@ module Teton
     def entry?
       parts.length.even?
     end
+
+    def resource?
+      parts.length.odd?
+    end
   end
 end

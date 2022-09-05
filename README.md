@@ -6,7 +6,7 @@
 
 ---
 
-Store key-value pair objects in a discoverable hierarchy.  Provides a pluggable interface for multiple back-ends.
+Store key-value pair-based objects in a key-based hierarchy.  Provides a pluggable interface for multiple back-ends.
 
 ## Installation
 
@@ -24,7 +24,14 @@ bundle add teton
 
 ## Examples
 
-The main API is made up of three instance methods: Db#set, Db#get, and Db#del.  You interact with each of these by passing in a key (and data for set).
+The main API is made up of these instance methods:
+
+Method              | Description
+------------------- | -----------
+`Db#set(key, data)` | Set an entries data to the passed in values.
+`Db#get(key)`       | Get the entry if it exists or nil if it does not.  If the key is a resource then it will always return an array.
+`Db#del(key)`       | Delete the key and all children of the key from the store.
+`Db#count(key)`     | The number of entries directly under a key if the key is a resource.  If they key is an entry then 1 if the entry exists and 0 if it does not exist.
 
 #### Setting Up Database
 
@@ -96,10 +103,12 @@ Note(s):
 
 Each back-end provides its own persistence mechanics.  For example, `Teton::Stores::Memory` provides persistence/serialization methods:
 
-* `#load!(path(`: Load from a file on disk
-* `#save!(path)`: Save to a file on disk
-* `#from_json!`: Deserialize a passed in JSON string
-* `#to_json`: Return a serialized JSON string
+Method              | Description
+------------------- | -----------
+`#load!(path(`      | Load from a file on disk
+`#save!(path)`      | Save to a file on disk
+`#from_json!`       | Deserialize a passed in JSON string
+`#to_json`          | Return a serialized JSON string
 
 ## Contributing
 

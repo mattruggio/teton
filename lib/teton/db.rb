@@ -38,6 +38,10 @@ module Teton
       tap { store.del(key(key)) }
     end
 
+    def count(key)
+      store.count(key(key))
+    end
+
     private
 
     def key(key)
