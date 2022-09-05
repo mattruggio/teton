@@ -1,0 +1,23 @@
+require:
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.7
+  Exclude:
+    - bin/*
+    - vendor/bundle/**/*
+    - '*.gemspec'
+
+Metrics/BlockLength:
+  Max: 30
+
+Metrics/MethodLength:
+  Max: 25
+
+RSpec/ExampleLength:
+  Max: 25
+
+Metrics/ClassLength:
+  Max: 150
