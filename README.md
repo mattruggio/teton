@@ -86,7 +86,7 @@ The back-end: `Teton::Stores::Memory` will be used by default.  You can also pas
 
 ````ruby
 store = Teton::Stores::MySQL.new(host: '127.0.0.1', db: 'teton_entries')
-db = Teton::Db.new(store: store)
+db    = Teton::Db.new(store: store)
 ````
 
 Note(s):
