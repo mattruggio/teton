@@ -5,6 +5,8 @@ require 'spec_helper'
 # rubocop:disable RSpec/MultipleExpectations
 # rubocop:disable RSpec/ExampleLength
 describe Teton do
+  # The other classes in this library need to be better unit-tested, but this at least gives
+  # the library a regression of the most common scenarios.
   it 'passes full API integration test' do
     # Stage data
     db = Teton::Db.new
@@ -114,6 +116,65 @@ describe Teton do
     bozo = db.get(bozo_key)
 
     expect(bozo).to be_nil
+  end
+
+  describe 'Paging' do
+    subject(:db) { Teton::Db.new }
+
+    let(:practice_key) { 'practices/1' }
+    let(:patients_key) { "#{practice_key}/patients" }
+
+    before do
+      db.set(practice_key, name: 'The Happy Practice')
+
+      (1..20).each do |i|
+        patient_key = "#{patients_key}/#{i}"
+
+        db.set(patient_key, first: 'Dobby', middle: 'is', last: "Number#{i}")
+      end
+    end
+
+    it 'limits with no skip' do
+      patients = db.get(patients_key, limit: 3)
+
+      expected_lasts = %w[Number1 Number2 Number3]
+      actual_lasts = patients.map { |p| p[:last] }
+
+      expect(actual_lasts).to eq(expected_lasts)
+    end
+
+    it 'limits with skip' do
+      patients = db.get(patients_key, limit: 3, skip: 3)
+
+      expected_lasts = %w[Number4 Number5 Number6]
+      actual_lasts = patients.map { |p| p[:last] }
+
+      expect(actual_lasts).to eq(expected_lasts)
+    end
+
+    it 'skips with no limit' do
+      patients = db.get(patients_key, skip: 18)
+
+      expected_lasts = %w[Number19 Number20]
+      actual_lasts = patients.map { |p| p[:last] }
+
+      expect(actual_lasts).to eq(expected_lasts)
+    end
+
+    it 'limit too large just goes to the end' do
+      patients = db.get(patients_key, skip: 19, limit: 100)
+
+      expected_lasts = %w[Number20]
+      actual_lasts = patients.map { |p| p[:last] }
+
+      expect(actual_lasts).to eq(expected_lasts)
+    end
+
+    it 'skip too large returns nothing' do
+      patients = db.get(patients_key, skip: 25)
+
+      expect(patients).to be_empty
+    end
   end
 end
 # rubocop:enable RSpec/ExampleLength

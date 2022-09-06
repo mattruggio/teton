@@ -15,7 +15,7 @@ module Teton
     end
 
     def [](data_key)
-      data[data_key]
+      data[data_key.to_s]
     end
 
     def to_s

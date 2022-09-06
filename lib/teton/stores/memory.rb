@@ -27,13 +27,13 @@ module Teton
         self
       end
 
-      def get(key)
+      def get(key, limit: nil, skip: nil)
         store_pointer = traverse_to_last(key)
 
         return unless store_pointer
 
         if key.resource?
-          entries(key, store_pointer, key.last_part)
+          entries(key, store_pointer, key.last_part, limit: limit, skip: skip)
         else
           entry(key, store_pointer, key.last_part)
         end
@@ -158,14 +158,20 @@ module Teton
         )
       end
 
-      def entries(key, pointer, part)
+      def entries(key, pointer, part, limit: nil, skip: nil)
         pointer = pointer.dig(part, IDS_KEY)
 
         return [] unless pointer
 
-        pointer.map do |inner_part, value|
+        start_index   = skip || 0
+        end_index     = limit ? (start_index + limit - 1) : -1
+        selected_keys = pointer.keys[start_index..end_index] || []
+
+        selected_keys.map do |selected_key|
+          value = pointer[selected_key]
+
           Entry.new(
-            key.to_s(inner_part),
+            key.to_s(selected_key),
             data: value[DATA_KEY],
             created_at: value[META_KEY][CREATED_AT_KEY],
             updated_at: value[META_KEY][UPDATED_AT_KEY]

@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/teton.svg)](https://badge.fury.io/rb/teton) [![Ruby Gem CI](https://github.com/mattruggio/teton/actions/workflows/rubygem.yml/badge.svg)](https://github.com/mattruggio/teton/actions/workflows/rubygem.yml) [![Maintainability](https://api.codeclimate.com/v1/badges/787a5d512223e85efd69/maintainability)](https://codeclimate.com/github/mattruggio/teton/maintainability) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-#### Hierarchical key-value object store interface
+#### Hierarchical key-value object store
 
 ---
 
@@ -26,12 +26,16 @@ bundle add teton
 
 The main API is made up of these instance methods:
 
-Method              | Description
-------------------- | -----------
-`Db#set(key, data)` | Set an entries data to the passed in values.
-`Db#get(key)`       | Get the entry if it exists or nil if it does not.  If the key is a resource then it will always return an array.
-`Db#del(key)`       | Delete the key and all children of the key from the store.
-`Db#count(key)`     | The number of entries directly under a key if the key is a resource.  If they key is an entry then 1 if the entry exists and 0 if it does not exist.
+Method                                 | Description
+---------------------------------------| --------------------------------------------------------------
+`Db#set(key, data = {})`               | Set an entries data to the passed in values.
+`Db#get(key, limit: nil, skip: nil)`   | Get the entry if it exists or nil if it does not.  If the key is a resource then it will always return an array.
+`Db#del(key)`                          | Delete the key and all children of the key from the store.
+`Db#count(key)`                        | The number of entries directly under a key if the key is a resource.  If they key is an entry then 1 if the entry exists and 0 if it does not exist.
+
+Note(s):
+
+* limit and skip are optional and only apply to resource keys, not entry keys.
 
 #### Setting Up Database
 

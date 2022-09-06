@@ -30,8 +30,12 @@ module Teton
       self
     end
 
-    def get(key)
-      store.get(key(key))
+    def get(key, limit: nil, skip: nil)
+      store.get(
+        key(key),
+        limit: zero_floor_or_nil(limit),
+        skip: zero_floor_or_nil(skip)
+      )
     end
 
     def del(key)
@@ -43,6 +47,12 @@ module Teton
     end
 
     private
+
+    def zero_floor_or_nil(value)
+      return unless value
+
+      value ? [value, 0].max : nil
+    end
 
     def key(key)
       key.is_a?(Key) ? key : Key.new(key, separator: separator)

@@ -5,7 +5,7 @@ require './lib/teton/version'
 Gem::Specification.new do |s|
   s.name        = 'teton'
   s.version     = Teton::VERSION
-  s.summary     = 'Hierarchical key-value object store interface.'
+  s.summary     = 'Hierarchical key-value object store.'
 
   s.description = 'Store key-value pair objects in a discoverable hierarchy.  Provides a pluggable interface for multiple back-ends.'
 
