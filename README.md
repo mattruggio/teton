@@ -82,7 +82,7 @@ Note(s):
 
 ````ruby
 db.del(leo_key)
-  .get(inception_key)
+  .del(inception_key)
   .del(bozo_key)
 ````
 
