@@ -10,17 +10,8 @@ Store key-value pair-based objects in a key-based hierarchy.  Provides a pluggab
 
 ## Installation
 
-To install through Rubygems:
-
-````
-gem install teton
-````
-
-You can also add this to your Gemfile using:
-
-````
-bundle add teton
-````
+* To install through Rubygems: `gem install teton`
+* You can also add this to your Gemfile using: `bundle add teton`
 
 ## Examples
 
