@@ -8,7 +8,6 @@ describe Teton do
   # The other classes in this library need to be better unit-tested, but this at least gives
   # the library a regression of the most common scenarios.
   it 'passes full API integration test' do
-    1/0 # fail again on purpose!
     # Stage data
     db = Teton::Db.new
 
