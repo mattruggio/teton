@@ -12,7 +12,6 @@ Store key-value pair-based objects in a key-based hierarchy.  Provides a pluggab
 
 * To install through Rubygems: `gem install teton`
 * You can also add this to your Gemfile using: `bundle add teton`
-
 ## Examples
 
 The main API is made up of these instance methods:
